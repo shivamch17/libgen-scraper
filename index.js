@@ -13,13 +13,14 @@ app.get('/cron', async(req, res) => {
 app.get('/scrape', async (req, res) => {
     let { url, limit, title } = req.query;
     if(!limit) limit = 5;
-    if(!url && title) url = `https://libgen.is/search.php?req=${encodeURIComponent(title)}`;
+    if(!url && title) url = `https://libgen.is/search.php?req=${encodeURIComponent(title)}&open=0&res=25&view=simple&phrase=1&column=def`;
     try {
         const scrapedData = await scrapeData(url, parseInt(limit));
         console.log('successfull scrape');
         res.status(200).json(scrapedData);
     } catch (error) {
         console.log('un-successfull scrape');
+        console.log(error);
         res.status(500).json({ error: 'An error occurred while scraping data.' });
     }
 });

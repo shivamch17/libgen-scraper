@@ -88,7 +88,8 @@ async function scrapeData(url, limit) {
             results.push(rowData);
         });
 
-        for (let i = 1; i <= Math.min(limit,results.length); i++) {
+        let ctr=(results.length<=limit)?results.length:limit+1;
+        for (let i = 1; i < ctr; i++) {
                 const data = await scrapeLinks(results[i].Mirror1);
                 results[i]['Image'] = data.image;
                 for (let j = 0; j < Math.min(data.links.length, 4); j++) {
