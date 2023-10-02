@@ -11,11 +11,11 @@ app.get('/cron', async(req, res) => {
 });
 
 app.get('/scrape', async (req, res) => {
-    let { url, limit, title } = req.query;
+    let { limit, title } = req.query;
+    if(!title) res.send("title is required");
     if(!limit) limit = 5;
-    if(!url && title) url = `https://libgen.is/search.php?req=${encodeURIComponent(title)}&open=0&res=25&view=simple&phrase=1&column=def`;
     try {
-        const scrapedData = await scrapeData(url, parseInt(limit));
+        const scrapedData = await scrapeData(title, parseInt(limit));
         console.log('successfull scrape');
         res.status(200).json(scrapedData);
     } catch (error) {
