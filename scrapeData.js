@@ -35,10 +35,7 @@ async function scrapeLibgenIs(title,limit){
             Extension: '',
             Mirror1: '',
             Mirror2: '',
-            DownloadLink1: '',
-            DownloadLink2: '',
-            DownloadLink3: '',
-            DownloadLink4: '',
+            DownloadLinks: [],
             Image: '',
         };
 
@@ -93,9 +90,7 @@ async function scrapeLibgenIs(title,limit){
     for (let i = 1; i < ctr; i++) {
         const data = await scrapeLinksLol(results[i].Mirror1);
         results[i]['Image'] = data.image;
-        for (let j = 0; j < Math.min(data.links.length, 4); j++) {
-            results[i][`DownloadLink${j + 1}`] = data.links[j];
-        }
+        results[i]['DownloadLinks'] = data.links;
     }
 
     return results.slice(1, limit + 1);
@@ -124,10 +119,7 @@ async function scrapeLibgenLi(title,limit){
             Extension: '',
             Mirror1: '',
             Mirror2: '',
-            DownloadLink1: '',
-            DownloadLink2: '',
-            DownloadLink3: '',
-            DownloadLink4: '',
+            DownloadLinks: [],
             Image: '',
         };
 
@@ -177,7 +169,7 @@ async function scrapeLibgenLi(title,limit){
     for (let i = 0; i < ctr; i++) {
             const data = await scrapeLinksPm(results[i].Mirror1);
             results[i]['Image'] = data.image;
-            results[i][`DownloadLink1`] = data.links[0];
+            results[i]['DownloadLinks'] = data.links;
     }
 
     return results.slice(0, limit);
