@@ -1,5 +1,7 @@
 import express from 'npm:express';
 import { scrapeData } from './scrapeData.js';
+import { Redis } from "https://deno.land/x/upstash_redis@v1.14.0/mod.ts";
+import "jsr:@std/dotenv/load";
 import cors from 'npm:cors';
 import { scrapeDataFast, getDownloadLink } from './scrapeDataFast.js';
 const app = express();
@@ -23,9 +25,22 @@ app.get('/scrape', async (req, res) => {
     else {
         if (!limit) limit = 5;
         try {
-            const scrapedData = await scrapeData(title, parseInt(limit));
-            console.log('successfull scrape');
-            res.status(200).json(scrapedData);
+            const redis = new Redis({
+                url: Deno.env.get("UPSTASH_REDIS_REST_URL"),
+                token: Deno.env.get("UPSTASH_REDIS_REST_TOKEN"),
+            })
+            let data = await redis.get(title);
+            if (data == null || data == undefined) {
+                const scrapedData = await scrapeData(title, parseInt(limit));
+                console.log('successfull scrape');
+                // Cache the result of the scrape, not the function
+                await redis.set(title, scrapedData); // Converting to string if it's an object
+                await redis.expire(title, 30);
+                res.status(200).json(scrapedData);
+            } else {
+                console.log('taken from cache');
+                res.status(200).json(data); // Parsing back to object if cached as string
+            }
         } catch (error) {
             console.log('un-successfull scrape');
             console.log(error);
